@@ -1,18 +1,18 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import "./BookDataCard.css";
+import "./CategoryDataCard.css";
 import useUserStore from "../store/userStore";
 
 const defaultPaginationSettings = {
   pageNumber: 1,
   pageSize: 10,
   nameContains: "",
-  sortBy: "bookName",
+  sortBy: "categoryName",
   sortAsc: true,
 };
 
-const BookDataCard = ({ setBooks }) => {
+const CategoryDataCard = ({ categories, setCategories }) => {
   const [paginationSettings, setPaginationSettings] = useState(
     defaultPaginationSettings
   );
@@ -25,47 +25,32 @@ const BookDataCard = ({ setBooks }) => {
 
   const token =
     useUserStore((state) => state.token) || localStorage.getItem("authToken");
-  const [categories, setCategories] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
   const pageNumber = watch("pageNumber");
   const pageSize = watch("pageSize");
-  const nameContains = watch("nameContains");
-  const categoryContains = watch("categoryContains");
+  const contains = watch("contains");
   const sortAsc = watch("sortAsc");
 
   useEffect(() => {
     if (token) {
       axios
-        .get("http://localhost:8080/api/books", {
+        .get("http://localhost:8080/api/book_categories", {
           params: paginationSettings,
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
         .then((response) => {
-          setBooks(response.data.content);
+          setCategories(response.data.content);
           setTotalPages(response.data.totalPages);
         })
         .catch((error) => console.log(error));
     }
-  }, [paginationSettings, setBooks, token]);
+  }, [paginationSettings, setCategories, token]);
 
-  useEffect(() => {
-    if (token) {
-      axios
-        .get("http://localhost:8080/api/book_categories", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          setCategories(response.data.content);
-        })
-        .catch((error) => console.log(error));
-    }
-  }, [setCategories, token]);
+  console.log(categories);
 
   useEffect(
     (prevSettings) => {
@@ -73,12 +58,11 @@ const BookDataCard = ({ setBooks }) => {
         ...prevSettings,
         pageNumber: pageNumber,
         pageSize: pageSize,
-        nameContains: nameContains,
-        categoryContains: categoryContains,
+        contains: contains,
         sortAsc: sortAsc,
       });
     },
-    [pageNumber, pageSize, nameContains, categoryContains, sortAsc]
+    [pageNumber, pageSize, contains, sortAsc]
   );
 
   const handlePageSelect = (event) => {
@@ -96,28 +80,12 @@ const BookDataCard = ({ setBooks }) => {
     </option>
   ));
 
-  const categoriesToDisplay = categories.map((category) => {
-    return (
-      <option key={category.id} value={category.categoryName}>
-        {category.categoryName}
-      </option>
-    );
-  });
-
   return (
     <>
-      <form className="bookDataCard">
+      <form className="categoryDataCard">
         <section className="paginationElement">
-          <label>book name</label>
-          <input {...register("nameContains")} placeholder="search a book" />
-        </section>
-
-        <section className="paginationElement">
-          <label>category</label>
-          <select {...register("categoryContains")}>
-            <option value=""></option>
-            {categoriesToDisplay}
-          </select>
+          <label>category name</label>
+          <input {...register("contains")} placeholder="search a category" />
         </section>
 
         <section className="paginationElement">
@@ -132,11 +100,11 @@ const BookDataCard = ({ setBooks }) => {
         </section>
 
         <section className="paginationElement">
-          <label>book number</label>
+          <label>lines to show</label>
           <select {...register("pageSize")} placeholder="page number">
+            <option value={5}>5</option>
             <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={30}>30</option>
+            <option value={15}>15</option>
           </select>
         </section>
 
@@ -152,4 +120,4 @@ const BookDataCard = ({ setBooks }) => {
   );
 };
 
-export default BookDataCard;
+export default CategoryDataCard;

@@ -1,7 +1,10 @@
 package lt.techin.exam.entity;
 
-
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,28 +12,23 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "book_category")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class BookCategory {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType   .UUID)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "category_name")
     private String categoryName;
 
-    @ManyToMany(fetch = FetchType.EAGER,
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "categories",
             cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(
-            name = "book_categories",
-            joinColumns = @JoinColumn(name = "category_id"),
-            inverseJoinColumns = @JoinColumn(name = "book_id")
-    )
-    private List<Book> books;
-
-
-    public BookCategory() {
-    }
+    private List<Book> books = new ArrayList<>();
 
     public BookCategory(String categoryName) {
         this.categoryName = categoryName;
@@ -41,32 +39,13 @@ public class BookCategory {
         this.books = books;
     }
 
-
     public void addBook(Book book) {
-        if (books == null) {
-            books = new ArrayList<>();
-        }
         books.add(book);
+        book.getCategories().add(this);
     }
 
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public List<Book> getBooks() {
-        return books;
-    }
-
-    public void setBooks(List<Book> books) {
-        this.books = books;
+    public void removeBook(Book book) {
+        books.remove(book);
+        book.getCategories().remove(this);
     }
 }

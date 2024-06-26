@@ -4,7 +4,7 @@ import axios from "axios";
 import "./CreateAccountCard.css";
 import { useNavigate } from "react-router-dom";
 import FormFieldError from "../elements/FormFieldError";
-import { useUserStore } from "../store/userStore";
+import useUserStore from "../store/userStore";
 
 const LogInAccountCard = () => {
   const {
@@ -41,7 +41,7 @@ const LogInAccountCard = () => {
 
   return (
     <>
-      <form className="createAccountCard">
+      <form className="createAccountCard" onSubmit={handleSubmit(onSubmit)}>
         <section>
           <input
             {...register("email", {

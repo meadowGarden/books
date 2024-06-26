@@ -42,15 +42,14 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER,
-            cascade = {CascadeType.DETACH, CascadeType.PERSIST,
-                    CascadeType.PERSIST, CascadeType.REFRESH}
-    )
-    @JoinTable(name = "user_books",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "book_id")
-    )
-    private List<Book> favouriteBooks;
+//    @ManyToMany(fetch = FetchType.EAGER,
+//            cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH}
+//    )
+//    @JoinTable(name = "user_books",
+//            joinColumns = @JoinColumn(name = "user_id"),
+//            inverseJoinColumns = @JoinColumn(name = "book_id")
+//    )
+//    private List<Book> favouriteBooks;
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
@@ -89,4 +88,14 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+//    public void addBook(Book book) {
+//        favouriteBooks.add(book);
+//        book.getUsers().add(this);
+//    }
+//
+//    public void removeBook(Book book) {
+//        favouriteBooks.remove(book);
+//        book.getUsers().remove(this);
+//    }
 }

@@ -4,12 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import lt.techin.exam.dto.BookDTO;
 import lt.techin.exam.entity.Book;
 import lt.techin.exam.entity.BookCategory;
-import lt.techin.exam.utilities.mapper.BookMapper;
 import lt.techin.exam.repository.BookCategoryRepository;
 import lt.techin.exam.repository.BookRepository;
 import lt.techin.exam.request.book.BookListRequest;
 import lt.techin.exam.response.book.BookListResponse;
 import lt.techin.exam.response.book.BookResponse;
+import lt.techin.exam.utilities.mapper.BookMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,7 +35,6 @@ public class BookService {
         this.bookRepository = bookRepository;
         this.bookCategoryRepository = bookCategoryRepository;
     }
-
 
     @Transactional
     public BookResponse addBook(BookDTO dto) {
@@ -125,6 +124,7 @@ public class BookService {
             bookToUpdate.setBookDescription(dto.getBookDescription());
             bookToUpdate.setIsbn(dto.getIsbn());
             bookToUpdate.setPageCount(dto.getPageCount());
+            bookRepository.save(bookToUpdate);
             log.info("book with isbn {} has been updated", bookToUpdate.getIsbn());
             return new BookResponse(bookToUpdate, HttpStatus.OK);
         }
@@ -133,12 +133,13 @@ public class BookService {
         return new BookResponse(new Book(), HttpStatus.NOT_FOUND);
     }
 
+    @Transactional
     public HttpStatus deleteBookByISBN(String isbn) {
         final Optional<Book> book = bookRepository.findByIsbnIgnoreCase(isbn);
 
         if (book.isPresent()) {
             final Book bookToDelete = book.get();
-            bookRepository.deleteById(bookToDelete.getId());
+            bookRepository.delete(bookToDelete);
             log.info("book with isbn {} has been deleted", isbn);
             return HttpStatus.NO_CONTENT;
         }

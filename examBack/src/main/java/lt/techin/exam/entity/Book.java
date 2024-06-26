@@ -1,9 +1,8 @@
 package lt.techin.exam.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jdk.jfr.Category;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +10,10 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "book")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Book {
 
     @Id
@@ -38,22 +41,18 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     @JsonIgnore
-    private List<BookCategory> categories;
+    private List<BookCategory> categories = new ArrayList<>();  // Initialize the collection
 
-    @ManyToMany(fetch = FetchType.EAGER,
-            cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.PERSIST, CascadeType.REFRESH}
-    )
-    @JoinTable(name = "user_books",
-            joinColumns = @JoinColumn(name = "book_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> users;
+//    @ManyToMany(fetch = FetchType.EAGER,
+//            cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH}
+//    )
+//    @JoinTable(name = "user_books",
+//            joinColumns = @JoinColumn(name = "book_id"),
+//            inverseJoinColumns = @JoinColumn(name = "user_id")
+//    )
+//    private List<User> users = new ArrayList<>();
 
-
-    public Book() {
-    }
-
-    public Book(String bookName, String bookDescription, String isbn, long pageCount) {
+    public Book(String bookName, String bookDescription, String isbn, int pageCount) {
         this.bookName = bookName;
         this.bookDescription = bookDescription;
         this.isbn = isbn;
@@ -68,56 +67,23 @@ public class Book {
         this.categories = categories;
     }
 
-
     public void addCategory(BookCategory bookCategory) {
-        if (categories == null) {
-            categories = new ArrayList<>();
-        }
         categories.add(bookCategory);
+        bookCategory.getBooks().add(this);
     }
 
-
-    public UUID getId() {
-        return id;
+    public void removeCategory(BookCategory bookCategory) {
+        categories.remove(bookCategory);
+        bookCategory.getBooks().remove(this);
     }
 
-    public String getBookName() {
-        return bookName;
-    }
-
-    public void setBookName(String bookName) {
-        this.bookName = bookName;
-    }
-
-    public String getBookDescription() {
-        return bookDescription;
-    }
-
-    public void setBookDescription(String bookDescription) {
-        this.bookDescription = bookDescription;
-    }
-
-    public String getIsbn() {
-        return isbn;
-    }
-
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
-    }
-
-    public long getPageCount() {
-        return pageCount;
-    }
-
-    public void setPageCount(long pageCount) {
-        this.pageCount = pageCount;
-    }
-
-    public List<BookCategory> getCategories() {
-        return categories;
-    }
-
-    public void setCategories(List<BookCategory> categories) {
-        this.categories = categories;
-    }
+//    public void addUser(User user) {
+//        users.add(user);
+//        user.getFavouriteBooks().add(this);
+//    }
+//
+//    public void removeUser(User user) {
+//        users.remove(user);
+//        user.getFavouriteBooks().remove(this);
+//    }
 }
